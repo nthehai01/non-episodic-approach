@@ -160,16 +160,20 @@ class RegularModel:
         """Loads a checkpoint.
 
         Args:
-            checkpoint_step (int): iteration of checkpoint to load
+            checkpoint_step (int or str): direction of checkpoint to load
             is_finetune (bool): whether pretrained_checkpoint loaded for finetuning phase
-
         Raises:
             ValueError: if checkpoint for checkpoint_step is not found
         """
-        target_path = (
-            f'{os.path.join(self._log_dir, "state")}'
-            f'{checkpoint_step}.pt'
-        )
+
+        if type(checkpoint_step) == int:
+            target_path = (
+                f'{os.path.join(self._log_dir, "state")}'
+                f'{checkpoint_step}.pt'
+            )
+        elif type(checkpoint_step) == str:
+            target_path = checkpoint_step
+
         if os.path.isfile(target_path):
             state = torch.load(target_path, map_location=torch.device(DEVICE))
 

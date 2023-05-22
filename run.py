@@ -33,9 +33,11 @@ def main(args):
     num_outputs = NUM_FINETUNE_CLASSES if args.finetune else NUM_PRETRAIN_CLASSES
     net = RegularModel(num_outputs, args.learning_rate, log_dir)
 
+    # Load checkpoint
     if args.checkpoint_step > -1:
-        for_finetune = True if args.finetune else False
-        net.load(args.checkpoint_step, for_finetune)
+        net.load(args.checkpoint_step, False)
+    elif args.finetune:
+        net.load(args.pretrained_weights, True)
     else:
         print('Checkpoint loading skipped.')
 
@@ -106,6 +108,8 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint_step', type=int, default=-1,
                         help=('checkpoint iteration to load for resuming '
                               'training, or for evaluation (-1 is ignored)'))
+    parser.add_argument('--pretrained_weights', type=str, default=None,
+                        help='pretrained weights to load for finetuning')
 
     main_args = parser.parse_args()
     main(main_args)

@@ -1,4 +1,5 @@
 """Data splitter for Pre-training and Fine-tuning phases."""
+
 import os
 import glob
 import numpy as np
@@ -6,8 +7,8 @@ import shutil
 import splitfolders
 
 
-_BASE_PATH = os.environ['_BASE_PATH']
-_SPLIT_PATH = os.environ['_SPLIT_PATH']
+BASE_PATH = os.environ['_BASE_PATH']
+SPLIT_PATH = os.environ['_SPLIT_PATH']
 NUM_PRETRAIN_CLASSES = int(os.environ['_NUM_PRETRAIN_CLASSES'])
 NUM_FINETUNE_CLASSES = int(os.environ['_NUM_FINETUNE_CLASSES'])
 PRETRAIN_FOLDER_NAME = os.environ['_PRETRAIN_FOLDER_NAME']
@@ -19,7 +20,7 @@ def load_data():
 
     # get all character folders
     character_folders = glob.glob(
-        os.path.join(_BASE_PATH, '*/*/')
+        os.path.join(BASE_PATH, '*/*/')
     )
     assert len(character_folders) == NUM_PRETRAIN_CLASSES + NUM_FINETUNE_CLASSES
 
@@ -42,20 +43,20 @@ def split_data(character_folders):
 def make_dataset(character_folders, split):
     """Create dataset folder for train, val, and test sets."""
 
-    os.makedirs(os.path.join(_SPLIT_PATH, split), exist_ok=True)
+    os.makedirs(os.path.join(SPLIT_PATH, split), exist_ok=True)
 
     for character_path in character_folders:
         writing_system, character = character_path.split('/')[-3:-1]
 
         src_path = character_path
-        dst_path = os.path.join(_SPLIT_PATH, split, f"{writing_system}_{character}")
+        dst_path = os.path.join(SPLIT_PATH, split, f"{writing_system}_{character}")
         shutil.copytree(src_path, dst_path)
 
 
 def train_val_test_split(folder_name):
     """Split data at folder_name into train, val, and test sets."""
 
-    input_directory = os.path.join(_SPLIT_PATH, folder_name)
+    input_directory = os.path.join(SPLIT_PATH, folder_name)
 
     splitfolders.ratio(
         input_directory, # The location of dataset
@@ -71,7 +72,7 @@ def clean_up(folder_name):
     """Remove character folders after splitting data."""
 
     character_folders = glob.glob(
-        os.path.join(_SPLIT_PATH, folder_name, '*/')
+        os.path.join(SPLIT_PATH, folder_name, '*/')
     )
 
     for character_path in character_folders:
@@ -84,7 +85,7 @@ def clean_up(folder_name):
 
 def main():
     # Make data dir
-    os.makedirs(_SPLIT_PATH, exist_ok=True)
+    os.makedirs(SPLIT_PATH, exist_ok=True)
 
     # Load and shuffle data
     character_folders = load_data()
@@ -104,7 +105,7 @@ def main():
     clean_up(PRETRAIN_FOLDER_NAME)
     clean_up(FINETUNE_FOLDER_NAME)
 
-    print(f"Data split stored in {_SPLIT_PATH}.")
+    print(f"Data split stored in {SPLIT_PATH}.")
 
 
 if __name__ == '__main__':
